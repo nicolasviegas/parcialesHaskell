@@ -136,6 +136,9 @@ excursionesDesestresantes unTurista  = filter (esDesestresante unTurista)
 
 type Tour = [Excursion]
 
+tourTest :: [Tour]
+tourTest = [tourLadoB irALaPlaya,tourCompleto,tourIslaVecina "fuerte"]
+
 tourCompleto :: Tour
 tourCompleto = [caminar 20 , apreciarElementoDelPaisaje "cascada", caminar 40, irALaPlaya, salirAHablarUnIdioma "malmacquiano"]
 
@@ -154,3 +157,27 @@ excursionEnIslaVecina tipoMarea
 hacerUnTour :: Turista -> Tour -> Turista
 hacerUnTour unTurista unTour = mapStress ((+) $ length unTour) $ foldl (flip realizarUnaExcursion) unTurista unTour
 
+
+hayTourConvincente ::  Turista -> [Tour] ->  Bool
+hayTourConvincente unTurista = any (esConvincente unTurista)
+
+esConvincente :: Turista -> Tour -> Bool
+esConvincente unTurista = any (dejaAcompaniado unTurista) . excursionesDesestresantes unTurista 
+
+dejaAcompaniado :: Turista -> Excursion -> Bool
+dejaAcompaniado unTurista unaExcursion = not (viajaSolo  (realizarUnaExcursion unaExcursion unTurista))
+
+efectividad :: Tour -> [Turista] -> Int
+efectividad unTour = sum . map (espiritualidadAportada unTour) . filter (flip esConvincente unTour)
+
+espiritualidadAportada :: Tour -> Turista -> Int
+espiritualidadAportada unTour = negate . deltaRutina unTour
+
+deltaRutina :: Tour -> Turista -> Int
+deltaRutina unTour unTurista = deltaSegun nivelDeRutina(hacerUnTour unTurista unTour ) unTurista
+
+nivelDeRutina :: Turista -> Int
+nivelDeRutina unTurista = stress unTurista + nivelDeCansancio unTurista
+ 
+turistas :: [Turista]
+turistas = [ana,nico,beto,cathi]
